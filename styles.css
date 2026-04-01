@@ -83,6 +83,39 @@ select {
   margin-bottom: 18px;
 }
 
+.experience-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.experience-tab {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 18px 20px;
+  background: rgba(255, 255, 255, 0.48);
+  color: var(--muted);
+  font-weight: 600;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.experience-tab:hover,
+.experience-tab:focus-visible {
+  transform: translateY(-1px);
+  color: var(--text);
+}
+
+.experience-tab.is-active {
+  border-color: rgba(200, 91, 47, 0.34);
+  background: rgba(200, 91, 47, 0.12);
+  color: var(--accent-strong);
+}
+
 .mode-button {
   display: flex;
   justify-content: space-between;
@@ -123,6 +156,10 @@ select {
   border-radius: 24px;
   padding: 24px;
   background: var(--surface-strong);
+}
+
+.experience-panel.is-hidden {
+  display: none;
 }
 
 .status-row {
@@ -203,6 +240,18 @@ select {
   color: var(--muted);
 }
 
+.pane-note {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.text-workspace {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+
 .pane-text {
   margin: 18px 0 0;
   font-size: clamp(1.1rem, 2vw, 1.5rem);
@@ -212,6 +261,38 @@ select {
 
 .pane-text.is-empty {
   color: #8d7e77;
+}
+
+.pane-input {
+  width: 100%;
+  margin-top: 18px;
+  border: 0;
+  resize: vertical;
+  min-height: 190px;
+  padding: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: clamp(1.1rem, 2vw, 1.45rem);
+  line-height: 1.55;
+  font-family: inherit;
+}
+
+.pane-input::placeholder {
+  color: #8d7e77;
+}
+
+.pane-input:focus {
+  outline: none;
+}
+
+.action-button {
+  margin-top: 18px;
+  border: 0;
+  border-radius: 999px;
+  padding: 14px 18px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-strong) 100%);
+  color: #fff7f1;
+  font-weight: 700;
 }
 
 .text-button {
@@ -249,6 +330,10 @@ select {
   }
 
   .panes {
+    grid-template-columns: 1fr;
+  }
+
+  .text-workspace {
     grid-template-columns: 1fr;
   }
 }

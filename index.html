@@ -24,6 +24,27 @@
       </section>
 
       <section class="translator-panel">
+        <div class="experience-tabs" role="tablist" aria-label="Translator type">
+          <button
+            id="tab-speech"
+            class="experience-tab is-active"
+            type="button"
+            role="tab"
+            aria-selected="true"
+          >
+            Speech Translation
+          </button>
+          <button
+            id="tab-text"
+            class="experience-tab"
+            type="button"
+            role="tab"
+            aria-selected="false"
+          >
+            Type Text Translation
+          </button>
+        </div>
+
         <div class="mode-switch" role="tablist" aria-label="Translation mode">
           <button
             id="mode-en-ko"
@@ -53,30 +74,65 @@
             <span id="lang-pair" class="lang-pair">EN → KO</span>
           </div>
 
-          <p id="listen-hint" class="keyboard-note">
-            Press <strong>E</strong> or <strong>K</strong>, or tap a mode button,
-            and listening starts immediately.
-          </p>
+          <div id="speech-panel" class="experience-panel">
+            <p id="listen-hint" class="keyboard-note">
+              Press <strong>E</strong> or <strong>K</strong>, or tap a mode
+              button, and listening starts immediately.
+            </p>
 
-          <div class="panes">
-            <article class="pane">
-              <p id="source-label" class="pane-label">Heard in English</p>
-              <p id="source-text" class="pane-text is-empty">
-                Your transcript will appear here.
-              </p>
-            </article>
+            <div class="panes">
+              <article class="pane">
+                <p id="source-label" class="pane-label">Heard in English</p>
+                <p id="source-text" class="pane-text is-empty">
+                  Your transcript will appear here.
+                </p>
+              </article>
 
-            <article class="pane pane-target">
-              <div class="pane-topline">
-                <p id="target-label" class="pane-label">Translated Korean</p>
-                <button id="speak-button" class="text-button" type="button">
-                  Speak again
+              <article class="pane pane-target">
+                <div class="pane-topline">
+                  <p id="target-label" class="pane-label">Translated Korean</p>
+                  <button id="speak-button" class="text-button" type="button">
+                    Speak again
+                  </button>
+                </div>
+                <p id="target-text" class="pane-text is-empty">
+                  The translated text will appear here and play automatically.
+                </p>
+              </article>
+            </div>
+          </div>
+
+          <div id="text-panel" class="experience-panel is-hidden">
+            <div class="text-workspace">
+              <article class="pane">
+                <div class="pane-topline">
+                  <p id="typed-source-label" class="pane-label">Type in English</p>
+                  <span class="pane-note">Manual input</span>
+                </div>
+                <textarea
+                  id="typed-source-text"
+                  class="pane-input"
+                  rows="7"
+                  placeholder="Type the source text here."
+                  aria-label="Typed source text"
+                ></textarea>
+                <button id="translate-button" class="action-button" type="button">
+                  Translate
                 </button>
-              </div>
-              <p id="target-text" class="pane-text is-empty">
-                The translated text will appear here and play automatically.
-              </p>
-            </article>
+              </article>
+
+              <article class="pane pane-target">
+                <div class="pane-topline">
+                  <p id="typed-target-label" class="pane-label">Translated Korean</p>
+                  <button id="typed-speak-button" class="text-button" type="button">
+                    Read aloud
+                  </button>
+                </div>
+                <p id="typed-target-text" class="pane-text is-empty">
+                  The translated text will appear here after you press Translate.
+                </p>
+              </article>
+            </div>
           </div>
         </div>
       </section>

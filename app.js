@@ -19,30 +19,44 @@ const MODES = {
   },
 };
 
-const EMPTY_SOURCE_TEXT = "Your transcript will appear here.";
 const EMPTY_TARGET_TEXT =
   "The translated text will appear here and play automatically.";
+const EMPTY_TYPED_TARGET_TEXT =
+  "The translated text will appear here after you press Translate.";
 
 const state = {
   mode: MODES.enToKo,
+  activeTab: "speech",
   recognition: null,
   isListening: false,
   transcript: "",
   translated: "",
+  typedTranscript: "",
+  typedTranslated: "",
   voices: [],
 };
 
 const elements = {
+  tabSpeech: document.querySelector("#tab-speech"),
+  tabText: document.querySelector("#tab-text"),
   modeEnKo: document.querySelector("#mode-en-ko"),
   modeKoEn: document.querySelector("#mode-ko-en"),
   statusBadge: document.querySelector("#status-badge"),
   langPair: document.querySelector("#lang-pair"),
   listenHint: document.querySelector("#listen-hint"),
+  speechPanel: document.querySelector("#speech-panel"),
+  textPanel: document.querySelector("#text-panel"),
   sourceLabel: document.querySelector("#source-label"),
   targetLabel: document.querySelector("#target-label"),
   sourceText: document.querySelector("#source-text"),
   targetText: document.querySelector("#target-text"),
   speakButton: document.querySelector("#speak-button"),
+  typedSourceLabel: document.querySelector("#typed-source-label"),
+  typedTargetLabel: document.querySelector("#typed-target-label"),
+  typedSourceText: document.querySelector("#typed-source-text"),
+  typedTargetText: document.querySelector("#typed-target-text"),
+  translateButton: document.querySelector("#translate-button"),
+  typedSpeakButton: document.querySelector("#typed-speak-button"),
 };
 
 const SpeechRecognitionApi =
@@ -63,6 +77,10 @@ function setPaneText(element, value, emptyMessage) {
   element.classList.add("is-empty");
 }
 
+function setSpeechSourceText(value) {
+  setPaneText(elements.sourceText, value, "Your transcript will appear here.");
+}
+
 function syncModeUi() {
   const isEnglishToKorean = state.mode.id === "enToKo";
 
@@ -73,13 +91,23 @@ function syncModeUi() {
 
   elements.sourceLabel.textContent = state.mode.sourceLabel;
   elements.targetLabel.textContent = state.mode.targetLabel;
+  elements.typedSourceLabel.textContent =
+    state.mode.id === "enToKo" ? "Type in English" : "Type in Korean";
+  elements.typedTargetLabel.textContent = state.mode.targetLabel;
   elements.langPair.textContent = state.mode.pairLabel;
 
   state.transcript = "";
   state.translated = "";
-  setPaneText(elements.sourceText, "", EMPTY_SOURCE_TEXT);
+  setSpeechSourceText("");
   setPaneText(elements.targetText, "", EMPTY_TARGET_TEXT);
   elements.speakButton.disabled = true;
+
+  state.typedTranscript = "";
+  state.typedTranslated = "";
+  elements.typedSourceText.value = "";
+  setPaneText(elements.typedTargetText, "", EMPTY_TYPED_TARGET_TEXT);
+  elements.typedSpeakButton.disabled = true;
+
   window.speechSynthesis.cancel();
   setStatus("Ready");
 }
@@ -103,14 +131,14 @@ function getVoiceForLanguage(lang) {
   );
 }
 
-function speakTranslatedText() {
-  if (!state.translated) {
+function speakText(text) {
+  if (!text) {
     return;
   }
 
   window.speechSynthesis.cancel();
 
-  const utterance = new SpeechSynthesisUtterance(state.translated);
+  const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = state.mode.targetLang === "ko" ? "ko-KR" : "en-US";
   utterance.rate = state.mode.targetLang === "ko" ? 0.92 : 1;
 
@@ -120,6 +148,14 @@ function speakTranslatedText() {
   }
 
   window.speechSynthesis.speak(utterance);
+}
+
+function speakTranslatedText() {
+  speakText(state.translated);
+}
+
+function speakTypedTranslatedText() {
+  speakText(state.typedTranslated);
 }
 
 async function translateText(text) {
@@ -149,7 +185,7 @@ async function translateText(text) {
 
 async function handleTranscript(finalTranscript) {
   state.transcript = finalTranscript.trim();
-  setPaneText(elements.sourceText, state.transcript, EMPTY_SOURCE_TEXT);
+  setSpeechSourceText(state.transcript);
 
   if (!state.transcript) {
     setStatus("Nothing heard");
@@ -178,6 +214,40 @@ async function handleTranscript(finalTranscript) {
     setStatus("Translation error");
     setPaneText(
       elements.targetText,
+      "",
+      "Translation failed. Check your internet connection and try again."
+    );
+  }
+}
+
+async function handleTypedTranslation() {
+  const sourceText = elements.typedSourceText.value.trim();
+  state.typedTranscript = sourceText;
+
+  if (!sourceText) {
+    state.typedTranslated = "";
+    elements.typedSpeakButton.disabled = true;
+    setStatus("Nothing to translate");
+    setPaneText(elements.typedTargetText, "", EMPTY_TYPED_TARGET_TEXT);
+    return;
+  }
+
+  setStatus("Translating");
+  setPaneText(elements.typedTargetText, "", EMPTY_TYPED_TARGET_TEXT);
+
+  try {
+    const translated = await translateText(sourceText);
+    state.typedTranslated = translated;
+    setPaneText(elements.typedTargetText, translated, EMPTY_TYPED_TARGET_TEXT);
+    elements.typedSpeakButton.disabled = false;
+    setStatus("Ready");
+  } catch (error) {
+    console.error(error);
+    state.typedTranslated = "";
+    elements.typedSpeakButton.disabled = true;
+    setStatus("Translation error");
+    setPaneText(
+      elements.typedTargetText,
       "",
       "Translation failed. Check your internet connection and try again."
     );
@@ -242,11 +312,7 @@ function startListening(forceRestart = false) {
       }
     }
 
-    setPaneText(
-      elements.sourceText,
-      `${finalTranscript}${interimTranscript}`.trim(),
-      EMPTY_SOURCE_TEXT
-    );
+    setSpeechSourceText(`${finalTranscript}${interimTranscript}`.trim());
   };
 
   recognition.onerror = (event) => {
@@ -291,9 +357,36 @@ function activateMode(mode) {
   startListening(switchingModes);
 }
 
+function setActiveTab(nextTab) {
+  state.activeTab = nextTab;
+  const isSpeechTab = nextTab === "speech";
+
+  elements.tabSpeech.classList.toggle("is-active", isSpeechTab);
+  elements.tabSpeech.setAttribute("aria-selected", String(isSpeechTab));
+  elements.tabText.classList.toggle("is-active", !isSpeechTab);
+  elements.tabText.setAttribute("aria-selected", String(!isSpeechTab));
+  elements.speechPanel.classList.toggle("is-hidden", !isSpeechTab);
+  elements.textPanel.classList.toggle("is-hidden", isSpeechTab);
+
+  if (!isSpeechTab) {
+    stopListening();
+    setStatus("Ready");
+  }
+}
+
+elements.tabSpeech.addEventListener("click", () => setActiveTab("speech"));
+elements.tabText.addEventListener("click", () => setActiveTab("text"));
 elements.modeEnKo.addEventListener("click", () => activateMode(MODES.enToKo));
 elements.modeKoEn.addEventListener("click", () => activateMode(MODES.koToEn));
 elements.speakButton.addEventListener("click", speakTranslatedText);
+elements.translateButton.addEventListener("click", handleTypedTranslation);
+elements.typedSpeakButton.addEventListener("click", speakTypedTranslatedText);
+elements.typedSourceText.addEventListener("keydown", (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+    event.preventDefault();
+    handleTypedTranslation();
+  }
+});
 
 document.addEventListener("keydown", (event) => {
   if (event.repeat) {
@@ -315,11 +408,13 @@ document.addEventListener("keydown", (event) => {
 
   if (key === "e") {
     event.preventDefault();
+    setActiveTab("speech");
     activateMode(MODES.enToKo);
   }
 
   if (key === "k") {
     event.preventDefault();
+    setActiveTab("speech");
     activateMode(MODES.koToEn);
   }
 });
@@ -327,3 +422,4 @@ document.addEventListener("keydown", (event) => {
 window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
 loadVoices();
 syncModeUi();
+setActiveTab("speech");

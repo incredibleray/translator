@@ -10,12 +10,15 @@ the translated text aloud automatically.
 
 ## Controls
 
+- `Speech Translation` keeps the hands-free flow.
 - Press `E` for English to Korean. The app switches mode and starts listening
   immediately.
 - Press `K` for Korean to English. The app switches mode and starts listening
   immediately.
 - You can also click either mode button to do the same thing.
-- Use `Speak again` if you want to replay the translated audio.
+- Use `Speak again` if you want to replay the translated audio in the speech tab.
+- `Type Text Translation` lets you type text manually, press `Translate`, and
+  optionally use `Read aloud` on the translated result.
 
 ## How to run
 
