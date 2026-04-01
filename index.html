@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EchoLingo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <p class="eyebrow">Fast speech translation</p>
+        <h1>Speak once. Hear the answer back instantly.</h1>
+        <p class="intro">
+          Pick a direction, tap listen, and the app will transcribe, translate,
+          and read the translated sentence aloud.
+        </p>
+      </section>
+
+      <section class="translator-panel">
+        <div class="mode-switch" role="tablist" aria-label="Translation mode">
+          <button
+            id="mode-en-ko"
+            class="mode-button is-active"
+            type="button"
+            role="tab"
+            aria-selected="true"
+          >
+            <span>English to Korean</span>
+            <span class="shortcut-hint">Press E</span>
+          </button>
+          <button
+            id="mode-ko-en"
+            class="mode-button"
+            type="button"
+            role="tab"
+            aria-selected="false"
+          >
+            <span>Korean to English</span>
+            <span class="shortcut-hint">Press K</span>
+          </button>
+        </div>
+
+        <div class="workspace">
+          <div class="status-row">
+            <span id="status-badge" class="status-badge">Ready</span>
+            <span id="lang-pair" class="lang-pair">EN → KO</span>
+          </div>
+
+          <p id="listen-hint" class="keyboard-note">
+            Press <strong>E</strong> or <strong>K</strong>, or tap a mode button,
+            and listening starts immediately.
+          </p>
+
+          <div class="panes">
+            <article class="pane">
+              <p id="source-label" class="pane-label">Heard in English</p>
+              <p id="source-text" class="pane-text is-empty">
+                Your transcript will appear here.
+              </p>
+            </article>
+
+            <article class="pane pane-target">
+              <div class="pane-topline">
+                <p id="target-label" class="pane-label">Translated Korean</p>
+                <button id="speak-button" class="text-button" type="button">
+                  Speak again
+                </button>
+              </div>
+              <p id="target-text" class="pane-text is-empty">
+                The translated text will appear here and play automatically.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
